@@ -234,18 +234,23 @@ def prepare_masked_instances(sentences, config, fictitious_entities, num_entity_
     masked_examples = {}
     for truism in sentences:
         for perturbation in sentences[truism]:
-
-            if 'paraphrase' not in perturbation:
-                candidate_answers = config[truism]['premise_switch']['0']
-            elif '_inversion' not in perturbation:
-                candidate_answers = config[truism]['premise_switch']['1']
-            else:
-                candidate_answers = config[truism]['premise_switch']['2']
+            if config != None:
+                if 'paraphrase' not in perturbation:
+                    candidate_answers = config[truism]['premise_switch']['0']
+                elif '_inversion' not in perturbation:
+                    candidate_answers = config[truism]['premise_switch']['1']
+                else:
+                    candidate_answers = config[truism]['premise_switch']['2']
 
             for premise in sentences[truism][perturbation]:
                 key = "-".join([truism, perturbation, premise])
-                
-                statement = sentences[truism][perturbation][premise]
+                if config == None:
+                    if sentences[truism][perturbation][premise] == []:
+                        continue
+                    candidate_answers = [sentences[truism][perturbation][premise][2], sentences[truism][perturbation][premise][3]]
+                    statement = sentences[truism][perturbation][premise][0]
+                else:
+                    statement = sentences[truism][perturbation][premise]
                 premise = statement.split(",")[0]
                 conclusion = statement.split(",")[1]
 

@@ -43,7 +43,7 @@ def main():
                         level = logging.INFO)
     logger = logging.getLogger(__name__)
     chars = string.ascii_lowercase
-    number_of_entity_trials = 10
+    number_of_entity_trials = 1
 
     roberta = torch.hub.load(github='pytorch/fairseq', model='roberta.large')
     roberta.eval()
@@ -53,6 +53,24 @@ def main():
                                                                 max_length=12,
                                                                 character_set=chars)
 
+    with open("../data/truism_data/RICA_10k_probe_sets.json", "r") as f:
+        extended_sents = json.load(f)
+    
+
+    logger.info("finished reading in physical data")
+
+    output_df = run_pipeline(model=roberta, 
+                             fictitious_entities=fictitious_entities, 
+                             sentences=extended_sents, 
+                             config=None, 
+                             number_of_entity_trials=number_of_entity_trials,
+                             logger=logger)
+
+    output_df.to_csv("../data/masked_word_result_data/roberta-large/physical_perf_2_{}.csv".format(number_of_entity_trials),
+                     index=False)
+
+    logger.info("finished saving physical dataset results")
+    
     with open("../data/truism_data/physical_data_sentences_2.json", "r") as f:
         physical_sents = json.load(f)
         
